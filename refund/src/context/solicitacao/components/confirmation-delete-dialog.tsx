@@ -8,9 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { NavLink } from "react-router";
 
 interface DialogDeleteConfirmationProps {
   isOpen: boolean;
@@ -37,14 +34,16 @@ export function DialogDeleteConfirmation({
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="flex items-center justify-end gap-10">
+        <DialogFooter className="flex items-center justify-end gap-6">
           <DialogClose asChild>
-            <NavLink
-              to="/"
-              className="justify-center text-emerald-700 text-lg font-semibold leading-6"
+            <Button
+              variant="link"
+              type="button"
+              className="text-xl font-semibold text-green-100 leading-4"
+              onClick={() => setIsOpen(false)}
             >
               Cancelar
-            </NavLink>
+            </Button>
           </DialogClose>
           <Button type="button" className="p-7 font-semibold text-lg">
             Confirmar

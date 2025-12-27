@@ -26,6 +26,7 @@ import {
 } from "../models/form-schema";
 import { useState } from "react";
 import { DialogDeleteConfirmation } from "./confirmation-delete-dialog";
+import FilePreview from "@/components/file-preview";
 
 interface FormSolicitacaoProps {
   setSucess: (item: boolean) => void;
@@ -42,7 +43,8 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
       file: undefined,
     },
   });
-
+  const file = form.watch("file");
+  const fileScource = file?.[0] ? URL.createObjectURL(file[0]) : undefined;
   function onSubmit(values: SolicitacaoFormSchema) {
     console.log(values);
     //setSucess(true);
@@ -149,7 +151,6 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
                     form={form}
                     allowedExtensions={["pdf"]}
                     maxFileSizeInMB={10}
-                    replaceBy={<div>Pegou arquivo</div>}
                     {...fieldProps}
                     onChange={(event) => {
                       onChange(event.target.files);

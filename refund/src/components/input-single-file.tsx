@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import Icon from "./icon";
 import Text, { textVariants } from "./text";
 import UploadFileIcon from "../assets/cloud-arrow-up.svg?react";
+import FileImageIcon from "../assets/file.svg?react";
 import { useMemo, type ComponentProps, type ReactNode } from "react";
 import { useWatch } from "react-hook-form";
 
@@ -45,7 +46,6 @@ interface InputSingleFileProps
   form: any;
   allowedExtensions: string[];
   maxFileSizeInMB: number;
-  replaceBy: ReactNode;
   error?: ReactNode;
 }
 
@@ -54,7 +54,6 @@ export default function InputSingleFile({
   error,
   form,
   allowedExtensions,
-  replaceBy,
   maxFileSizeInMB,
   ...props
 }: InputSingleFileProps) {
@@ -132,13 +131,16 @@ export default function InputSingleFile({
         </>
       ) : (
         <>
-          {replaceBy}
-          <div className="truncate max-w-80">
-            <Text variant="heading-medium" className="text-placeholder">
-              {formFile.name}
-            </Text>
+          <div className="flex gap-3 items-center justify-center p-3">
+            <Icon svg={FileImageIcon} className="fill-green-100 w-6 h-6" />
+            <div className="truncate max-w-80">
+              <Text className="text-placeholder text-sm text-green-100">
+                {formFile.name}
+              </Text>
+            </div>
           </div>
-          <div className="flex">
+
+          <div className="flex justify-center text-red-600">
             <button
               type="button"
               className={textVariants({
