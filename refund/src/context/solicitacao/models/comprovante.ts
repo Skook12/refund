@@ -9,3 +9,7 @@ export type Comprovante = {
     updatedAt: string;
   };
 };
+
+export type ComprovanteDownload = {
+  url: string;
+};

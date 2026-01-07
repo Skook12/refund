@@ -30,14 +30,17 @@ import useSolicitacoes from "../hooks/use-solicitacoes";
 import type { SolicitacaoItem } from "../models/solicitacao";
 import Icon from "@/components/icon";
 import FileImageIcon from "../../../assets/file.svg?react";
+import type { ComprovanteDownload } from "../models/comprovante";
 interface FormSolicitacaoProps {
   setSucess: (item: boolean) => void;
   defaultData?: SolicitacaoItem;
+  fileUrl?: ComprovanteDownload;
 }
 
 export default function FormSolicitacao({
   setSucess,
   defaultData,
+  fileUrl,
 }: FormSolicitacaoProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { createReembolso } = useSolicitacoes();
@@ -169,7 +172,7 @@ export default function FormSolicitacao({
             />
           </div>
 
-          {!defaultData ? (
+          {!defaultData && (
             <FormField
               control={form.control}
               name="file"
@@ -193,13 +196,18 @@ export default function FormSolicitacao({
                 </FormItem>
               )}
             />
-          ) : (
+          )}
+          {fileUrl && (
             <div className="flex gap-3 items-center justify-center w-full p-3">
               <Icon svg={FileImageIcon} className="fill-green-100 w-6 h-6" />
               <div className="truncate max-w-80">
-                <Text className="text-placeholder text-sm text-green-100 font-semibold">
+                <a
+                  href={fileUrl.url}
+                  download
+                  className="text-placeholder text-sm text-green-100 font-semibold "
+                >
                   Abrir Comprovante
-                </Text>
+                </a>
               </div>
             </div>
           )}
