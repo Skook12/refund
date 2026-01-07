@@ -2,8 +2,14 @@ import { Input } from "@/components/ui/input";
 import Text from "@/components/text";
 import SearchIcon from "../../../assets/magnifying-glass.svg?react";
 import ButtonIcon from "@/components/ui/button-icon";
+import { useState } from "react";
 
-export default function FilterMain() {
+interface FilterMainProps {
+  setSeachQ: (item: string) => void;
+}
+
+export default function FilterMain({ setSeachQ }: FilterMainProps) {
+  const [name, setName] = useState("");
   return (
     <>
       <Text variant="heading-medium" className="text-gray-100 self-stretch">
@@ -15,10 +21,15 @@ export default function FilterMain() {
             <Input
               className="self-stretch h-12 pl-4 rounded-lg outline  outline-offset- outline-neutral-300"
               placeholder="Pesquise pelo nome"
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
-          <ButtonIcon icon={SearchIcon} className="w-12 h-12 " />
+          <ButtonIcon
+            icon={SearchIcon}
+            className="w-12 h-12 "
+            onClick={() => setSeachQ(name)}
+          />
         </div>
       </div>
     </>
