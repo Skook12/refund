@@ -14,6 +14,7 @@ export default function ListMain({ list }: ListMainProps) {
           title={item.title}
           category={item.category}
           value={item.value}
+          id={item.id}
         />
       ))}
     </div>

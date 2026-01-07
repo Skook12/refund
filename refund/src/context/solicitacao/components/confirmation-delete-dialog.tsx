@@ -8,16 +8,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useSolicitacoes from "../hooks/use-solicitacoes";
 
 interface DialogDeleteConfirmationProps {
   isOpen: boolean;
   setIsOpen: (item: boolean) => void;
+  id: string;
 }
 
 export function DialogDeleteConfirmation({
   isOpen,
   setIsOpen,
+  id,
 }: DialogDeleteConfirmationProps) {
+  const { deleteSolicitacao } = useSolicitacoes();
   return (
     <Dialog open={isOpen}>
       <DialogContent
@@ -45,7 +49,11 @@ export function DialogDeleteConfirmation({
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="button" className="p-7 font-semibold text-lg">
+          <Button
+            type="button"
+            className="p-7 font-semibold text-lg"
+            onClick={() => deleteSolicitacao(id)}
+          >
             Confirmar
           </Button>
         </DialogFooter>

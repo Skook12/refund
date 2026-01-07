@@ -24,37 +24,62 @@ import {
   type SolicitacaoFormSchema,
   solicitacaoFormSchema,
 } from "../models/form-schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DialogDeleteConfirmation } from "./confirmation-delete-dialog";
-import FilePreview from "@/components/file-preview";
-
+import useSolicitacoes from "../hooks/use-solicitacoes";
+import type { SolicitacaoItem } from "../models/solicitacao";
+import Icon from "@/components/icon";
+import FileImageIcon from "../../../assets/file.svg?react";
 interface FormSolicitacaoProps {
   setSucess: (item: boolean) => void;
+  defaultData?: SolicitacaoItem;
 }
 
-export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
+export default function FormSolicitacao({
+  setSucess,
+  defaultData,
+}: FormSolicitacaoProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { createReembolso } = useSolicitacoes();
   const form = useForm<SolicitacaoFormSchema>({
     resolver: zodResolver(solicitacaoFormSchema),
     defaultValues: {
-      name: "",
-      category: "",
-      value: "",
+      name: defaultData?.refund.title || "",
+      category: defaultData?.refund.category || "",
+      value: defaultData?.refund.value.toString() || "",
       file: undefined,
     },
   });
-  const file = form.watch("file");
-  const fileScource = file?.[0] ? URL.createObjectURL(file[0]) : undefined;
-  function onSubmit(values: SolicitacaoFormSchema) {
+
+  useEffect(() => {
+    if (defaultData) {
+      form.reset({
+        name: defaultData.refund.title,
+        category: defaultData.refund.category,
+        value: defaultData.refund.value.toString(),
+        file: undefined,
+      });
+    }
+  }, [defaultData, form]);
+
+  async function onSubmit(values: SolicitacaoFormSchema) {
     console.log(values);
-    //setSucess(true);
-    setIsOpen(true);
+    try {
+      await createReembolso(values);
+      setSucess(true);
+      form.reset();
+    } catch (error) {
+      console.error(error);
+    }
+    //setIsOpen(true);
   }
   return (
     <>
       <div className="self-stretch flex flex-col justify-start items-start gap-5">
         <Text variant="heading-medium" className="text-gray-100 self-stretch">
-          Nova solicitação de reembolso
+          {!defaultData
+            ? "Nova solicitação de reembolso"
+            : "Solicitação de reembolso"}
         </Text>
         <Text variant="paragraph-medium-normal" className="text-gray-200">
           Dados da despesa para solicitar reembolso.
@@ -75,9 +100,10 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
                     placeholder="Nome da solicitação"
                     className="py-7 px-5 text-lg md:text-lg placeholder:text-lg peer"
                     {...field}
+                    disabled={!!defaultData}
                   />
                 </FormControl>
-                <FormLabel className="text-gray-200 peer-focus:text-green-100 peer-focus:font-bold text-[12px] font-normal uppercase transition-colors leading-4">
+                <FormLabel className="text-gray-200 peer-focus:text-green-100 peer-focus:font-bold text-[12px] font-normal uppercase transition-colors leading-4 disabled:opacity-100">
                   NOME DA SOLICITAÇÃO
                 </FormLabel>
                 <FormMessage />
@@ -93,10 +119,11 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
                 <FormItem className="flex flex-col-reverse gap-2 flex-1 min-w-50">
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
+                    disabled={!!defaultData}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full py-7 px-5 text-lg md:text-lg peer">
+                      <SelectTrigger className="w-full py-7 px-5 text-lg md:text-lg peer disabled:opacity-50 disabled:cursor-default">
                         <SelectValue placeholder="Categoria" />
                       </SelectTrigger>
                     </FormControl>
@@ -105,10 +132,10 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
                       className="border-2 border-gray-300"
                     >
                       <SelectItem value="food">Alimentação</SelectItem>
-                      <SelectItem value="hotel">Hospedagem</SelectItem>
+                      <SelectItem value="hosting">Hospedagem</SelectItem>
                       <SelectItem value="transport">Transporte</SelectItem>
                       <SelectItem value="services">Serviços</SelectItem>
-                      <SelectItem value="others">Outros</SelectItem>
+                      <SelectItem value="other">Outros</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormLabel className="text-gray-200 peer-data-[state=open]:text-green-100 peer-data-[state=open]:font-bold text-[12px] font-normal uppercase transition-colors leading-4">
@@ -129,6 +156,7 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
                       type="text"
                       placeholder="0,00"
                       className="py-7 px-5 text-lg md:text-lg placeholder:text-lg peer"
+                      disabled={!!defaultData}
                       {...field}
                     />
                   </FormControl>
@@ -141,36 +169,62 @@ export default function FormSolicitacao({ setSucess }: FormSolicitacaoProps) {
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="file"
-            render={({ field: { value, onChange, ...fieldProps } }) => (
-              <FormItem className="w-full flex flex-col-reverse gap-2 group">
-                <FormControl>
-                  <InputSingleFile
-                    form={form}
-                    allowedExtensions={["pdf"]}
-                    maxFileSizeInMB={10}
-                    {...fieldProps}
-                    onChange={(event) => {
-                      onChange(event.target.files);
-                    }}
-                  />
-                </FormControl>
-                <FormLabel className="text-gray-200 group-focus-within:text-green-100 group-focus-within:font-bold text-[12px] font-normal uppercase transition-colors leading-4">
-                  COMPROVANTE
-                </FormLabel>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button type="submit" className="w-full p-7 font-semibold text-lg">
-            Enviar
-          </Button>
+          {!defaultData ? (
+            <FormField
+              control={form.control}
+              name="file"
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <FormItem className="w-full flex flex-col-reverse gap-2 group">
+                  <FormControl>
+                    <InputSingleFile
+                      form={form}
+                      allowedExtensions={["pdf"]}
+                      maxFileSizeInMB={2}
+                      {...fieldProps}
+                      onChange={(event) => {
+                        onChange(event.target.files);
+                      }}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-gray-200 group-focus-within:text-green-100 group-focus-within:font-bold text-[12px] font-normal uppercase transition-colors leading-4">
+                    COMPROVANTE
+                  </FormLabel>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            <div className="flex gap-3 items-center justify-center w-full p-3">
+              <Icon svg={FileImageIcon} className="fill-green-100 w-6 h-6" />
+              <div className="truncate max-w-80">
+                <Text className="text-placeholder text-sm text-green-100 font-semibold">
+                  Abrir Comprovante
+                </Text>
+              </div>
+            </div>
+          )}
+          {!defaultData ? (
+            <Button type="submit" className="w-full p-7 font-semibold text-lg">
+              Enviar
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              className="w-full p-7 font-semibold text-lg"
+              onClick={() => setIsOpen(true)}
+            >
+              Excluir
+            </Button>
+          )}
         </form>
       </Form>
-      <DialogDeleteConfirmation setIsOpen={setIsOpen} isOpen={isOpen} />
+      {defaultData && (
+        <DialogDeleteConfirmation
+          setIsOpen={setIsOpen}
+          isOpen={isOpen}
+          id={defaultData?.refund.id}
+        />
+      )}
     </>
   );
 }
