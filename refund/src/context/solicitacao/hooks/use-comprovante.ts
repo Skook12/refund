@@ -8,5 +8,5 @@ export default function useComprovante(id: string | undefined) {
     queryFn: () => fetcher(`receipts/download/${id}`),
     enabled: !!id,
   });
-  return { url: data, isDownloading: isLoading };
+  return { fileUrl: data, isDownloading: isLoading };
 }

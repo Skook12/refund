@@ -30,11 +30,10 @@ import useSolicitacoes from "../hooks/use-solicitacoes";
 import type { SolicitacaoItem } from "../models/solicitacao";
 import Icon from "@/components/icon";
 import FileImageIcon from "../../../assets/file.svg?react";
-import type { ComprovanteDownload } from "../models/comprovante";
 interface FormSolicitacaoProps {
   setSucess: (item: boolean) => void;
   defaultData?: SolicitacaoItem;
-  fileUrl?: ComprovanteDownload;
+  fileUrl?: string;
 }
 
 export default function FormSolicitacao({
@@ -181,7 +180,7 @@ export default function FormSolicitacao({
                   <FormControl>
                     <InputSingleFile
                       form={form}
-                      allowedExtensions={["pdf"]}
+                      allowedExtensions={["pdf", "jpeg"]}
                       maxFileSizeInMB={2}
                       {...fieldProps}
                       onChange={(event) => {
@@ -202,8 +201,8 @@ export default function FormSolicitacao({
               <Icon svg={FileImageIcon} className="fill-green-100 w-6 h-6" />
               <div className="truncate max-w-80">
                 <a
-                  href={fileUrl.url}
-                  download
+                  href={`${import.meta.env.VITE_API_URL}${fileUrl}`}
+                  download={"recibo"}
                   className="text-placeholder text-sm text-green-100 font-semibold "
                 >
                   Abrir Comprovante

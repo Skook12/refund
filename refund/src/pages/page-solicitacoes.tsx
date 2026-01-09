@@ -9,7 +9,7 @@ export default function Solicitacoes() {
   const [solicitacaoConcluida, setSolicitacaoConcluida] = useState(false);
   const params = useParams();
   const { data } = useSolicitacao(params?.id);
-  const { url } = useComprovante(data?.refund.receipt.id);
+  const { fileUrl } = useComprovante(data?.refund.receipt.id);
 
   return (
     <div className="w-2xl p-14 bg-gray-50 rounded-2xl inline-flex flex-col justify-start items-start gap-10">
@@ -17,7 +17,7 @@ export default function Solicitacoes() {
         <FormSolicitacao
           setSucess={setSolicitacaoConcluida}
           defaultData={data}
-          fileUrl={url}
+          fileUrl={fileUrl?.url}
         />
       ) : (
         <SucessConfirmation setSucess={setSolicitacaoConcluida} />
